@@ -1,0 +1,191 @@
+1000 locations of 10bits => 160 LUT
+
+_____________________________________________________________________________________________
+
+Distributed RAM: Preliminary Mapping  Report (see note below)
++--------------+------------+----------------+----------------------+------------------+
+|Module Name   | RTL Object | Inference      | Size (Depth x Width) | Primitives       | 
++--------------+------------+----------------+----------------------+------------------+
+|testSynthesis | memory_reg | User Attribute | 1 K x 10             | RAM256X1S x 40   | 
++--------------+------------+----------------+----------------------+------------------+
+Note: The table above is a preliminary report that shows the Distributed RAMs
+at the current stage of the synthesis flow. 
+Some Distributed RAMs may be reimplemented as non Distributed RAM primitives later in the synthesis flow.
+Multiple instantiated RAMs are reported only once.
+_____________________________________________________________________________________________
+Case A:
+
+10 locations each 10-bit
+[The results will be the same if 16 locations each 10-bit]
+|     LUT as Distributed RAM |   10 |     0 |           |       |
+
+Distributed RAM: Preliminary Mapping  Report (see note below)
++--------------+------------+----------------+----------------------+-----------------+
+|Module Name   | RTL Object | Inference      | Size (Depth x Width) | Primitives      | 
++--------------+------------+----------------+----------------------+-----------------+
+|testSynthesis | memory_reg | User Attribute | 16 x 10              | RAM16X1S x 10   | 
++--------------+------------+----------------+----------------------+-----------------+
+
+_____________________________________________________________________________________________
+Case B:
+
+32 locations each 10-bit
+
+
+Distributed RAM: Preliminary Mapping  Report (see note below)
++--------------+------------+----------------+----------------------+-----------------+
+|Module Name   | RTL Object | Inference      | Size (Depth x Width) | Primitives      | 
++--------------+------------+----------------+----------------------+-----------------+
+|testSynthesis | memory_reg | User Attribute | 32 x 10              | RAM32X1S x 10   | 
++--------------+------------+----------------+----------------------+-----------------+
+
+Still 10 LUTs use appears on the utilization report
+but now rather than RAM16X1S , RAM32X1S is used. 
+
+_____________________________________________________________________________________________
+Case C:
+
+256 locations each 10-bit
+
+Distributed RAM: Preliminary Mapping  Report (see note below)
++--------------+------------+----------------+----------------------+------------------+
+|Module Name   | RTL Object | Inference      | Size (Depth x Width) | Primitives       | 
++--------------+------------+----------------+----------------------+------------------+
+|testSynthesis | memory_reg | User Attribute | 128 x 10             | RAM128X1S x 10   | 
++--------------+------------+----------------+----------------------+------------------+
+
+But 20 LUTs use appears on the utilization report
+and 10 F7 Muxes are added on the utilization report 
+
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 10 instances were transformed.
+  RAM128X1S => RAM128X1S (MUXF7, RAMS64E, RAMS64E): 10 instances
+
+_____________________________________________________________________________________________
+Case D:
+
+1024 locations each 10-bit 
+
+
+Distributed RAM: Preliminary Mapping  Report (see note below)
++--------------+------------+----------------+----------------------+------------------+
+|Module Name   | RTL Object | Inference      | Size (Depth x Width) | Primitives       | 
++--------------+------------+----------------+----------------------+------------------+
+|testSynthesis | memory_reg | User Attribute | 1 K x 10             | RAM256X1S x 40   | 
++--------------+------------+----------------+----------------------+------------------+
+
+and in Report Cell Usage: 
+|8     |RAM256X1S |    40|
+
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 40 instances were transformed.
+  RAM256X1S => RAM256X1S (MUXF7, MUXF7, MUXF8, RAMS64E, RAMS64E, RAMS64E, RAMS64E): 40 instances
+
+So finally 160 LUT is used as distributed RAM in the utilization report 
++ 80 F7 MUXes  + 40 F8 Muxes 
+
+
+_____________________________________________________________________________________________
+Case E: 
+8960 locations each 10-bit 
+
+
+Distributed RAM: Preliminary Mapping  Report (see note below)
++--------------+------------+----------------+----------------------+-------------------+
+|Module Name   | RTL Object | Inference      | Size (Depth x Width) | Primitives        | 
++--------------+------------+----------------+----------------------+-------------------+
+|testSynthesis | memory_reg | User Attribute | 16 K x 10            | RAM256X1S x 350   | 
++--------------+------------+----------------+----------------------+-------------------+
+
+
+|8     |RAM256X1S |   350|
+
+350 RAM each of 256 bit means 89600 bit covers exactly the needed memory_reg
+
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 350 instances were transformed.
+  RAM256X1S => RAM256X1S (MUXF7, MUXF7, MUXF8, RAMS64E, RAMS64E, RAMS64E, RAMS64E): 350 instances
+
+The actual utilization in the utilization report is   4*350=1400 LUT used as distributed RAM
++ 700 F7 Muxes and 350 F8 Muxes 
+
+_____________________________________________________________________________________________
+Case F:
+when trying to read 2 locations at a time from the same memory above
+8960 locations each 10-bit 
+
+
+Distributed RAM: Preliminary Mapping  Report (see note below)
++--------------+------------+----------------+----------------------+-------------------+
+|Module Name   | RTL Object | Inference      | Size (Depth x Width) | Primitives        | 
++--------------+------------+----------------+----------------------+-------------------+
+|testSynthesis | memory_reg | User Attribute | 16 K x 10            | RAM128X1D x 700   | 
++--------------+------------+----------------+----------------------+-------------------+  
+
+|10    |RAM128X1D |   700|
+
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 700 instances were transformed.
+  RAM128X1D => RAM128X1D (RAMD64E, RAMD64E, MUXF7, MUXF7, RAMD64E, RAMD64E): 700 instances
+
+  
+
+Now LUT as distributed memory jumps to 2800  out of 6000 available 
+_____________________________________________________________________________________________
+Case G:
+and for 4 simulatenous read at the same time 
+
+Distributed RAM: Preliminary Mapping  Report (see note below)
++--------------+------------+----------------+----------------------+-------------------------------------------------+
+|Module Name   | RTL Object | Inference      | Size (Depth x Width) | Primitives                                      | 
++--------------+------------+----------------+----------------------+-------------------------------------------------+
+|testSynthesis | memory_reg | User Attribute | 16 K x 10            | RAM64X1D x 280  RAM128X1D x 700  RAM64M x 840   | 
++--------------+------------+----------------+----------------------+-------------------------------------------------+
+
+
+|11    |RAM128X1D |   700|
+|12    |RAM64M    |   840|
+|13    |RAM64X1D  |   280|
+
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 1820 instances were transformed.
+  RAM128X1D => RAM128X1D (RAMD64E, RAMD64E, MUXF7, MUXF7, RAMD64E, RAMD64E): 700 instances
+  RAM64M => RAM64M (RAMD64E, RAMD64E, RAMD64E, RAMD64E): 840 instances
+  RAM64X1D => RAM64X1D (RAMD64E, RAMD64E): 280 instances
+
+|   LUT as Memory            | 6720 |     0 |      6000 | 112.00 |
+is now over utilization. 
+
+_____________________________________________________________________________________________
+Case H:
+
+Even if the 4 reads from the memory each done in a different clock cycle 
+but written as memory[addr],memory[addr+1],memory[addr+2],memory[addr+3]
+has the same effect on utilization 
+_____________________________________________________________________________________________
+Case I:
+But 4 reads from the memory each don in a different clock cycle 
+written as memory[addr] and increase addr after each cycle 
+leads in the first RAM256X1S x 350 implemented as 1400 LUT as distributed RAM 
+[as the RAM256X1S is transformed into four RAMS64E]
+_____________________________________________________________________________________________
+increasing the number of simulatenous reading could cause the following error to appear 
+"Trying to implement RAM 'memory_reg' in registers. 
+Block RAM or DRAM implementation is not possible; see log for reasons."
+_____________________________________________________________________________________________
+Best trade-off solution :
+ to implement a huge size distributed RAM and search for many simulatenous read/write 
+ then try to decompose it into many smaller sizes distributed RAMs and do simulatenous read/write by coding 
+ 
+_____________________________________________________________________________________________
+
+ 
+
+
+
+
+
+
+
+  
+
